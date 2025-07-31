@@ -1,3 +1,5 @@
+"use client";
+
 import { Dock, DockIcon } from "@/components/magicui/dock";
 import { ModeToggle } from "@/components/mode-toggle";
 import { buttonVariants } from "@/components/ui/button";
@@ -10,8 +12,26 @@ import {
 import { DATA } from "@/data/resume";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
+import { CalendarIcon } from "lucide-react";
+import { getCalApi } from "@calcom/embed-react";
+import { useEffect } from "react";
+import { useTheme } from "next-themes";
 
 export default function Navbar() {
+  const { theme } = useTheme();
+
+  useEffect(() => {
+    (async function () {
+      const cal = await getCalApi();
+      cal("ui", {
+        theme: theme === "dark" ? "dark" : "light",
+        styles: {
+          branding: { brandColor: theme === "dark" ? "#ffffff" : "#000000" },
+        },
+      });
+    })();
+  }, [theme]);
+
   return (
     <div className="pointer-events-none fixed inset-x-0 bottom-0 z-30 mx-auto mb-4 flex origin-bottom h-full max-h-14">
       <div className="fixed bottom-0 inset-x-0 h-16 w-full bg-background to-transparent backdrop-blur-lg [-webkit-mask-image:linear-gradient(to_top,black,transparent)] dark:bg-background"></div>
@@ -59,6 +79,28 @@ export default function Navbar() {
               </Tooltip>
             </DockIcon>
           ))}
+        <Separator orientation="vertical" className="h-full py-2" />
+        <DockIcon>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  data-cal-link="arnurartykbay/30min"
+                  data-cal-config={JSON.stringify({
+                    theme: theme === "dark" ? "dark" : "light"
+                  })}
+                  className={cn(
+                    buttonVariants({ variant: "ghost", size: "icon" }),
+                    "size-12 hover:bg-muted transition-colors"
+                  )}
+                >
+                  <CalendarIcon className="size-4" />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Book a Call</p>
+              </TooltipContent>
+            </Tooltip>
+          </DockIcon>
         <Separator orientation="vertical" className="h-full py-2" />
         <DockIcon>
           <Tooltip>
